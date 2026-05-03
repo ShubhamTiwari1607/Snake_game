@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 using namespace sf;
+using namespace std;
 
 const int CELL_SIZE = 20;
 enum Direction
@@ -13,8 +15,10 @@ enum Direction
 int main()
 {
     RenderWindow window(VideoMode(800, 600), "Snake Game");
-    RectangleShape snake(Vector2f(20.f, 20.f));
-    snake.setPosition(100.f, 100.f);
+
+    vector<Vector2i> snake = {Vector2i(10, 10), Vector2i(9, 10), Vector2i(8, 10)};
+    RectangleShape snakeShape(Vector2f(CELL_SIZE, CELL_SIZE));
+    snakeShape.setPosition(100.f, 100.f);
 
     int x = 10;
     int y = 10;
@@ -40,19 +44,28 @@ int main()
             dir = RIGHT;
         if (clock.getElapsedTime().asSeconds() > delay)
         {
+            for (int i = snake.size() - 1; i > 0; i--)
+            {
+                snake[i] = snake[i - 1];
+            }
             if (dir == UP)
-                y--;
+                snake[0].y--;
             if (dir == DOWN)
-                y++;
+                snake[0].y++;
             if (dir == LEFT)
-                x--;
+                snake[0].x--;
             if (dir == RIGHT)
-                x++;
+                snake[0].x++;
             clock.restart();
         }
-        snake.setPosition(x * CELL_SIZE, y * CELL_SIZE);
+
         window.clear();
-        window.draw(snake);
+        for (auto segment : snake)
+        {
+            snakeShape.setPosition(segment.x * CELL_SIZE,
+                                   segment.y * CELL_SIZE);
+            window.draw(snakeShape);
+        }
         window.display();
     }
     return 0;
