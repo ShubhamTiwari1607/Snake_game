@@ -28,6 +28,10 @@ enum GameState
 
 class Snake
 {
+private:
+    vector<Vector2i> segments;
+    Direction direction;
+    bool alive;
 public:
     Snake()
     {
@@ -108,14 +112,23 @@ public:
     const Vector2i &getHead() const { return segments[0]; }
     bool isAlive() const { return alive; }
 
-private:
-    vector<Vector2i> segments;
-    Direction direction;
-    bool alive;
+
 };
 
 class Food
 {
+private:
+    Vector2i position;
+
+    bool isOnSnake(const vector<Vector2i> &snakeSegments) const
+    {
+        for (const auto &segment : snakeSegments)
+        {
+            if (segment == position)
+                return true;
+        }
+        return false;
+    }
 public:
     Food() { position = {0, 0}; }
 
@@ -130,63 +143,11 @@ public:
 
     const Vector2i &getPosition() const { return position; }
 
-private:
-    Vector2i position;
 
-    bool isOnSnake(const vector<Vector2i> &snakeSegments) const
-    {
-        for (const auto &segment : snakeSegments)
-        {
-            if (segment == position)
-                return true;
-        }
-        return false;
-    }
 };
 
 class Game
 {
-public:
-    Game()
-        : window(VideoMode(WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE), "Snake Game"),
-          state(Ready),
-          delay(0.15f),
-          score(0),
-          fontLoaded(false)
-    {
-        window.setFramerateLimit(60);
-        foodShape.setSize(Vector2f(CELL_SIZE, CELL_SIZE));
-        foodShape.setFillColor(Color::Red);
-        block.setSize(Vector2f(CELL_SIZE, CELL_SIZE));
-        block.setFillColor(Color::Green);
-
-        if (font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
-        {
-            fontLoaded = true;
-            statusText.setFont(font);
-            statusText.setCharacterSize(22);
-            statusText.setFillColor(Color::White);
-            statusText.setStyle(Text::Bold);
-
-            infoText.setFont(font);
-            infoText.setCharacterSize(16);
-            infoText.setFillColor(Color::White);
-        }
-
-        restart();
-    }
-
-    void run()
-    {
-        while (window.isOpen())
-        {
-            processEvents();
-            if (state == Playing)
-                update();
-            render();
-        }
-    }
-
 private:
     RenderWindow window;
     Snake snake;
@@ -327,6 +288,48 @@ private:
         state = Ready;
         clock.restart();
     }
+public:
+    Game()
+        : window(VideoMode(WIDTH * CELL_SIZE, HEIGHT * CELL_SIZE), "Snake Game"),
+          state(Ready),
+          delay(0.15f),
+          score(0),
+          fontLoaded(false)
+    {
+        window.setFramerateLimit(60);
+        foodShape.setSize(Vector2f(CELL_SIZE, CELL_SIZE));
+        foodShape.setFillColor(Color::Red);
+        block.setSize(Vector2f(CELL_SIZE, CELL_SIZE));
+        block.setFillColor(Color::Green);
+
+        if (font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
+        {
+            fontLoaded = true;
+            statusText.setFont(font);
+            statusText.setCharacterSize(22);
+            statusText.setFillColor(Color::White);
+            statusText.setStyle(Text::Bold);
+
+            infoText.setFont(font);
+            infoText.setCharacterSize(16);
+            infoText.setFillColor(Color::White);
+        }
+
+        restart();
+    }
+
+    void run()
+    {
+        while (window.isOpen())
+        {
+            processEvents();
+            if (state == Playing)
+                update();
+            render();
+        }
+    }
+
+
 };
 
 int main()
